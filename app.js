@@ -1,4 +1,5 @@
 'use strict'
+const config = require('./config.js')
 const Cash = require('./models/Cash')
 const DAL = require('./DAL')
 const express = require('express')
@@ -50,4 +51,4 @@ app.post('/', async (req, res) => {
         }
     }
 })
-app.listen(9000, () => console.log('bff is listening'))
+app.listen(config.PORT, () => console.log('bff is listening'))
