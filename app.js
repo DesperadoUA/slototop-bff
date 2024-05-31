@@ -10,25 +10,22 @@ app.get('/', async (req, res) => {
     return res.end("Good day")
 })
 app.post('/', async (req, res) => {
-	const type = req.body.type
+    const type = req.body.type
     const url = req.body.url || type
     if(type === 'search') {
-        const {search_word} = req.body
-        const response = await DAL.get({type, search_word})
+        const response = await DAL.get(req.body)
         res.json(response.data)
-    } 
+    }
     else if (type === 'loading') {
-        const {postType} = req.body
-        const {card} = req.body
+        const {postType, card} = req.body
         const loadingUrl = card ? `${type}/${postType}/${card}/${url}` : `${type}/${postType}/${url}`
         const {data} = await Cash.get(loadingUrl)
         if(!data) {
-            const response = await DAL.get({...req.body})
+            const response = await DAL.get(req.body)
             const {data} = await Cash.get(loadingUrl)
             if(!data) {
-              console.log(response.data)
-                Cash.store(loadingUrl, JSON.stringify(response.data))
-                res.json(response.data)
+              await Cash.store(loadingUrl, JSON.stringify(response.data))
+              res.json(response.data)
             }
         }
         res.json(JSON.parse(data))
@@ -37,16 +34,16 @@ app.post('/', async (req, res) => {
         const {data} = await Cash.get(url)
         if(data) res.json(JSON.parse(data))
         else {
-            const response = await DAL.get({type, url})
+            const response = await DAL.get(req.body)
             const {data} = await Cash.get(url)
             if(!data) {
                if(type === 'loading') {
-                const {postType} = req.body.postType
+                const {postType} = req.body
                 const loadingUrl = `${type}/${postType}/${url}`
-                Cash.store(loadingUrl, JSON.stringify(response.data))
+                await Cash.store(loadingUrl, JSON.stringify(response.data))
                } 
                else {
-                  Cash.store(url, JSON.stringify(response.data))
+                  await Cash.store(url, JSON.stringify(response.data))
                }
             } 
             res.json(response.data)
