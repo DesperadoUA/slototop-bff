@@ -32,11 +32,12 @@ app.post('/', async (req, res) => {
         res.json(JSON.parse(data))
     } 
     else {
-        const {data} = await Cash.get(url)
+        const fullUrl = `/${type}/${url}`
+        const {data} = await Cash.get(fullUrl)
         if(data) res.json(JSON.parse(data))
         else {
             const response = await DAL.get(req.body)
-            const {data} = await Cash.get(url)
+            const {data} = await Cash.get(fullUrl)
             if(!data) {
                if(type === 'loading') {
                 const {postType} = req.body
@@ -44,7 +45,7 @@ app.post('/', async (req, res) => {
                 await Cash.store(loadingUrl, JSON.stringify(response.data))
                } 
                else {
-                  await Cash.store(url, JSON.stringify(response.data))
+                  await Cash.store(fullUrl, JSON.stringify(response.data))
                }
             } 
             res.json(response.data)
